@@ -19,22 +19,6 @@ int SearchDistance(vector<int> rowDistance, int& index, vector <int> X) {
 	return min;
 }
 
-void SearchСandidate(vector<int>& copyX, vector<int> rowDistance, vector<vector<int>> distance, 
-	int& index, vector<int>& NextVec, vector <pair <int, int>>& pairs ) {
-	int m = 0;
-	int CurrentCity = 0;
-	int next = 0;
-	while (m < copyX.size()) {
-		CurrentCity = copyX[m];
-		rowDistance = distance[CurrentCity];
-		next = SearchDistance(rowDistance, index, copyX);
-		NextVec.push_back(next);
-		pairs.push_back(make_pair(CurrentCity + 1, index + 1));
-		cout << "Пара " << m + 1 << ": ";
-		cout << pairs[m].first << " - " << pairs[m].second << " и расстояние между ними: " << NextVec[m] << endl;
-		m++;
-	}
-}
 int main() {
 	setlocale(LC_ALL, "rus");
 	vector<vector<int>> distance(N, vector<int>(N)); // матрица расстояний
@@ -52,6 +36,9 @@ int main() {
 	mt19937 gen(rd());
 	vector<int> X; //города
 	vector <int> copyX; // промежуточный вектор для городов
+	int m = 0;
+	int CurrentCity = 0;
+	int next = 0;
 
 	for (int i = 0; i < N; i++) {
 		X.push_back(i);
@@ -82,15 +69,29 @@ int main() {
 	for (int j = 0; j < S.size(); j++) {
 		cout << " " << S[j];
 	}
-	cout << endl;
+	cout << endl << endl;
+
+
 	while (!X.empty()) {
 		cout << "Шаг " << step + 1 << endl;
 		cout << "Кандидаты: " << endl;
 		copyX.clear();
 		pairs.clear();
 		NextVec.clear();
+		m = 0;
+		CurrentCity = 0;
+		next = 0;
 		copy(X.begin(), X.end(), back_inserter(copyX));
-		SearchСandidate(copyX, rowDistance, distance, index, NextVec, pairs);
+		while (m < S.size()) {
+			CurrentCity = S[m];
+			rowDistance = distance[CurrentCity-1];
+			next = SearchDistance(rowDistance, index, copyX);
+			NextVec.push_back(next);
+			pairs.push_back(make_pair(CurrentCity, index + 1));
+			cout << "Пара " << m + 1 << ": ";
+			cout << pairs[m].first << " - " << pairs[m].second << " и расстояние между ними: " << NextVec[m] << endl;
+			m++;
+		}
 		cout << "Выбран кандидат: ";
 		min = 999;
 		for (int k = 0; k < NextVec.size(); k++) {
@@ -100,22 +101,20 @@ int main() {
 			}
 		}
 		cout << pairs[index].first << " - " << pairs[index].second << endl;
-		S.push_back(pairs[index].first);
-		S.push_back(pairs[index].second);
+		for (int i = 0; i < S.size(); i++) {
+			if (S[i] == pairs[index].first) {
+				S.insert(S.begin() + i + 1, pairs[index].second);
+				break;
+			}
+		}
 		cout << "Текущий обход:";
 		for (int j = 0; j < S.size(); j++) {
 			cout << " " << S[j];
 		}
 		cout << endl;
 		cout << "Длина текущего обхода: ";
-		Q.push_back(distance[Xi][(pairs[index].first) - 1]);
 		Q.push_back(min);
 		cout << round(accumulate(Q.begin(), Q.end(), 0)) << endl;
-		for (int k = 0; k < X.size(); k++) {
-			if (X[k] == (pairs[index].first - 1)) {
-				X.erase(X.begin() + k);
-			}
-		}
 		for (int k = 0; k < X.size(); k++) {
 			if (X[k] == (pairs[index].second - 1)) {
 				X.erase(X.begin() + k);
@@ -124,6 +123,8 @@ int main() {
 		cout << endl;
 		step++;
 	}
+
+
 	cout << "Шаг " << step + 1 << endl;
 	cout << "Текущий обход:";
 	for (int j = 0; j < S.size(); j++) {
