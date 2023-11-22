@@ -92,6 +92,7 @@ int main() {
 			cout << pairs[m].first << " - " << pairs[m].second << " и расстояние между ними: " << NextVec[m] << endl;
 			m++;
 		}
+
 		cout << "Выбран кандидат: ";
 		min = 999;
 		for (int k = 0; k < NextVec.size(); k++) {
@@ -100,6 +101,7 @@ int main() {
 				index = k;
 			}
 		}
+
 		cout << pairs[index].first << " - " << pairs[index].second << endl;
 		for (int i = 0; i < S.size(); i++) {
 			if (S[i] == pairs[index].first) {
@@ -107,14 +109,22 @@ int main() {
 				break;
 			}
 		}
+
 		cout << "Текущий обход:";
 		for (int j = 0; j < S.size(); j++) {
 			cout << " " << S[j];
 		}
 		cout << endl;
+
 		cout << "Длина текущего обхода: ";
-		Q.push_back(min);
-		cout << round(accumulate(Q.begin(), Q.end(), 0)) << endl;
+		Q.clear();
+		for (int i = 1; i < S.size(); i++) {
+			int dist = 0;
+			dist = distance[S[i-1]-1][S[i]-1];
+			Q.push_back(dist);
+		}
+		cout << accumulate(Q.begin(), Q.end(), 0) << endl;
+
 		for (int k = 0; k < X.size(); k++) {
 			if (X[k] == (pairs[index].second - 1)) {
 				X.erase(X.begin() + k);
